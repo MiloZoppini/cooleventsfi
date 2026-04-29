@@ -209,32 +209,56 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
 .reel-cat.FOOD    {color:#E0653A}
 .reel-cat.CULTURA {color:#A04AD3}
 .reel-meta{
-  font-size:11px;font-weight:600;color:#fff;
-  background:rgba(0,0,0,0.4);
-  padding:5px 10px;border-radius:100px;
+  display:flex;align-items:stretch;gap:8px;
+  color:#16140F;
+}
+.mini-cal{
+  width:48px;min-height:54px;border-radius:9px;overflow:hidden;
+  background:rgba(255,255,255,0.96);
+  border:1px solid rgba(255,255,255,0.55);
+  box-shadow:0 8px 22px rgba(0,0,0,0.18);
+  text-align:center;
+}
+.mini-cal-month{
+  display:block;
+  background:var(--accent);
+  color:#16140F;
+  font-size:8px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  padding:3px 2px 2px;
+}
+.mini-cal-day{
+  display:block;
+  font-family:'Syne','Helvetica Neue',sans-serif;
+  font-size:21px;font-weight:800;line-height:1;
+  padding-top:6px;
+}
+.mini-cal-weekday{
+  display:block;
+  font-size:8px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:0.06em;
+  padding:2px 2px 5px;
+}
+.date-context{
+  align-self:center;
+  color:#fff;
+  background:rgba(0,0,0,0.45);
+  border:1px solid rgba(255,255,255,0.16);
   backdrop-filter:blur(8px);
-  letter-spacing:0.02em;
+  padding:7px 9px;border-radius:10px;
+  display:flex;flex-direction:column;gap:1px;
+  min-width:72px;
 }
-
-/* right-side actions like IG */
-.reel-actions{
-  position:absolute;right:12px;bottom:140px;z-index:3;
-  display:flex;flex-direction:column;gap:14px;align-items:center;
+.date-rel{
+  font-size:10px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
 }
-.act{
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:18px;cursor:pointer;
-  transition:transform 0.12s, background 0.12s;
-  border:1px solid rgba(255,255,255,0.12);
+.date-time{
+  font-size:11px;font-weight:600;color:rgba(255,255,255,0.82);
+  white-space:nowrap;
 }
-.act:hover{transform:scale(1.08);background:rgba(0,0,0,0.6)}
-.act-lbl{font-size:9px;color:#fff;margin-top:-8px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.6)}
 
 .reel-info{
   position:absolute;bottom:0;left:0;right:0;z-index:3;
-  padding:18px 70px 22px 18px;
+  padding:18px 18px 22px 18px;
   color:#fff;
   display:flex;flex-direction:column;gap:6px;
 }
@@ -304,7 +328,7 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
   box-shadow:0 0 12px rgba(200,255,0,0.9);
 }
 .reel-source{
-  position:absolute;top:52px;left:14px;z-index:4;
+  position:absolute;top:82px;left:14px;z-index:4;
   color:#fff;text-decoration:none;
   display:inline-flex;align-items:center;gap:6px;
   max-width:calc(100% - 28px);
@@ -322,6 +346,29 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
 }
 .reel-source span{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.date-divider{
+  scroll-snap-align:start;
+  width:min(420px, 92vw);
+  display:flex;align-items:center;gap:12px;
+  color:var(--text);
+  padding:8px 4px 0;
+  flex-shrink:0;
+}
+.date-divider::after{
+  content:'';
+  height:1px;flex:1;
+  background:var(--border-hover);
+}
+.date-divider-kicker{
+  font-size:10px;font-weight:800;letter-spacing:0.11em;text-transform:uppercase;
+  color:var(--muted);
+}
+.date-divider-title{
+  display:block;
+  font-family:'Syne','Helvetica Neue',sans-serif;
+  font-size:20px;font-weight:800;letter-spacing:-0.02em;
+  line-height:1;
 }
 
 /* ─── MODAL ─── */
@@ -547,6 +594,63 @@ const sourceFor = ev => {
     tag: ev.socialVideo ? `video da ${social.label}` : social.label
   };
 };
+const scheduleToday = new Date(2026, 3, 29);
+const monthLabels = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+const weekdayLabels = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+
+function parseEventDate(ev) {
+  const raw = (ev.data || '').toLowerCase();
+  const match = raw.match(/(\d{1,2})\/(\d{1,2})/);
+  const ongoing = raw.includes('fino') || raw.includes('in corso');
+  const date = match
+    ? new Date(2026, Number(match[2]) - 1, Number(match[1]))
+    : new Date(scheduleToday);
+  const dayDiff = Math.round((date - scheduleToday) / 86400000);
+  const weekend = date.getDay() === 0 || date.getDay() === 6;
+  let relative = `${weekdayLabels[date.getDay()]} ${date.getDate()} ${monthLabels[date.getMonth()]}`;
+  if (ongoing) relative = raw.includes('fino') ? `fino al ${date.getDate()} ${monthLabels[date.getMonth()]}` : 'in corso';
+  if (!ongoing && dayDiff === 0) relative = 'oggi';
+  if (!ongoing && dayDiff === 1) relative = 'domani';
+  if (!ongoing && dayDiff > 1 && weekend) relative = 'weekend';
+
+  let groupLabel = `${weekdayLabels[date.getDay()]} ${date.getDate()} ${monthLabels[date.getMonth()]}`;
+  let groupKicker = 'prossimi';
+  let sort = date.getTime();
+  if (ongoing) {
+    groupLabel = 'In corso';
+    groupKicker = 'aperti ora';
+    sort = scheduleToday.getTime() - 1;
+  } else if (dayDiff === 0) {
+    groupLabel = 'Oggi';
+    groupKicker = `${weekdayLabels[date.getDay()]} ${date.getDate()} ${monthLabels[date.getMonth()]}`;
+  } else if (dayDiff === 1) {
+    groupLabel = 'Domani';
+    groupKicker = `${weekdayLabels[date.getDay()]} ${date.getDate()} ${monthLabels[date.getMonth()]}`;
+  } else if (weekend) {
+    groupKicker = 'weekend';
+  }
+
+  return {
+    date,
+    sort,
+    ongoing,
+    day: date.getDate(),
+    month: monthLabels[date.getMonth()],
+    weekday: weekdayLabels[date.getDay()],
+    relative,
+    groupLabel,
+    groupKicker,
+    groupKey: `${groupKicker}-${groupLabel}`
+  };
+}
+
+function sortedEvents(events) {
+  return [...events].sort((a, b) => {
+    const da = parseEventDate(a);
+    const db = parseEventDate(b);
+    return da.sort - db.sort || (a.orario || '').localeCompare(b.orario || '');
+  });
+}
 
 const allEvents = [
   // ─── Mer 29 aprile ───
@@ -731,9 +835,10 @@ document.querySelectorAll('.fb').forEach(btn => {
 
 // ── Render ──
 function render() {
-  filtered = activeFilter === 'TUTTI'
+  const visibleEvents = activeFilter === 'TUTTI'
     ? allEvents
     : allEvents.filter(e => (e.categoria || '').toUpperCase() === activeFilter);
+  filtered = sortedEvents(visibleEvents);
 
   gCount.textContent = filtered.length;
 
@@ -743,15 +848,13 @@ function render() {
     return;
   }
 
-  feedEl.innerHTML = filtered.map((e, i) => reelHTML(e, i)).join('');
+  feedEl.innerHTML = feedHTML(filtered);
   thumbsEl.innerHTML = filtered.map((e, i) => thumbHTML(e, i)).join('');
 
   // wire reel clicks → modal
-  feedEl.querySelectorAll('.reel').forEach((el, i) => {
+  feedEl.querySelectorAll('.reel').forEach((el) => {
     el.addEventListener('click', (ev) => {
-      // ignore clicks on action buttons
-      if (ev.target.closest('.act')) return;
-      openModal(filtered[i]);
+      openModal(filtered[Number(el.dataset.idx)]);
     });
   });
 
@@ -791,6 +894,23 @@ function render() {
   setActiveThumb(0);
 }
 
+function feedHTML(events) {
+  let lastGroup = '';
+  return events.map((e, i) => {
+    const date = parseEventDate(e);
+    const divider = date.groupKey !== lastGroup
+      ? `<div class="date-divider">
+          <div>
+            <span class="date-divider-kicker">${date.groupKicker}</span>
+            <span class="date-divider-title">${date.groupLabel}</span>
+          </div>
+        </div>`
+      : '';
+    lastGroup = date.groupKey;
+    return divider + reelHTML(e, i, date);
+  }).join('');
+}
+
 function setActiveThumb(idx) {
   thumbsEl.querySelectorAll('.thumb').forEach((t, i) => {
     t.classList.toggle('active', i === idx);
@@ -798,9 +918,8 @@ function setActiveThumb(idx) {
   });
 }
 
-function reelHTML(ev, i) {
+function reelHTML(ev, i, date = parseEventDate(ev)) {
   const cat = (ev.categoria || 'CULTURA').toUpperCase();
-  const meta = [ev.data, ev.orario].filter(Boolean).join(' · ');
   const loc = [ev.luogo, ev.quartiere].filter(Boolean).join(' · ');
   const vibes = (ev.vibe || []).slice(0,3).map(v => `<span class="vibe">#${v}</span>`).join('');
   const imgUrl = ev.img ? U(ev.img, 900, 1600) : '';
@@ -817,15 +936,19 @@ function reelHTML(ev, i) {
 
       <div class="reel-top">
         <span class="reel-cat ${cat}">${cat}</span>
-        <span class="reel-meta">${meta}</span>
+        <span class="reel-meta">
+          <span class="mini-cal" aria-label="${date.relative}">
+            <span class="mini-cal-month">${date.month}</span>
+            <span class="mini-cal-day">${date.day}</span>
+            <span class="mini-cal-weekday">${date.weekday}</span>
+          </span>
+          <span class="date-context">
+            <span class="date-rel">${date.relative}</span>
+            ${ev.orario ? `<span class="date-time">${ev.orario}</span>` : ''}
+          </span>
+        </span>
       </div>
       ${source ? `<a class="reel-source" href="${source.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><span>${source.tag}</span></a>` : ''}
-
-      <div class="reel-actions">
-        <div class="act" title="Mi piace">♡</div>
-        <div class="act" title="Salva">⌘</div>
-        <div class="act" title="Condividi">↗</div>
-      </div>
 
       <div class="reel-info">
         <div class="reel-title">${ev.titolo || 'Evento'}</div>
