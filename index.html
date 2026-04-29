@@ -288,45 +288,6 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
   padding:3px 9px;border-radius:100px;
 }
 
-.reel-tap{
-  position:absolute;bottom:18px;right:18px;z-index:3;
-  font-size:10px;color:rgba(255,255,255,0.75);font-weight:600;
-  letter-spacing:0.05em;text-transform:uppercase;
-  display:flex;align-items:center;gap:4px;
-  text-shadow:0 1px 4px rgba(0,0,0,0.6);
-}
-
-/* play indicator (placeholder for video) */
-.reel-play{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:64px;height:64px;border-radius:50%;
-  background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:24px;
-  border:1.5px solid rgba(255,255,255,0.5);
-  opacity:0;transition:opacity 0.2s;
-  pointer-events:none;
-  z-index:2;
-}
-.reel:hover .reel-play{opacity:1}
-.reel.has-video .reel-play{
-  top:18px;left:auto;right:18px;
-  transform:none;
-  width:auto;height:auto;border-radius:100px;
-  padding:5px 9px;
-  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
-  background:rgba(0,0,0,0.42);
-  border:1px solid rgba(255,255,255,0.18);
-  opacity:1;
-}
-.reel.has-video .reel-play::before{
-  content:'';
-  width:6px;height:6px;border-radius:50%;
-  background:#C8FF00;
-  display:inline-block;margin-right:6px;
-  box-shadow:0 0 12px rgba(200,255,0,0.9);
-}
 .reel-source{
   position:absolute;top:82px;left:14px;z-index:4;
   color:#fff;text-decoration:none;
@@ -932,7 +893,6 @@ function reelHTML(ev, i, date = parseEventDate(ev)) {
         ${videoUrl ? `<video class="reel-video" src="${videoUrl}" poster="${imgUrl}" autoplay muted loop playsinline preload="metadata"></video>` : ''}
       </div>
       <div class="reel-overlay"></div>
-      ${videoUrl ? `<div class="reel-play">reel</div>` : ''}
 
       <div class="reel-top">
         <span class="reel-cat ${cat}">${cat}</span>
