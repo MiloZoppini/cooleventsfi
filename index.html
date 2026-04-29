@@ -192,14 +192,16 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
 .reel-img.CULTURA {background:linear-gradient(135deg,#3A0F4F,#A04AD3)}
 
 .reel-top{
-  position:absolute;top:14px;left:14px;right:14px;z-index:3;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  position:absolute;top:14px;left:14px;right:14px;z-index:5;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  pointer-events:none;
 }
 .reel-cat{
   font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
   background:rgba(255,255,255,0.95);color:#16140F;
   padding:5px 10px;border-radius:100px;
   backdrop-filter:blur(8px);
+  flex:0 0 auto;
 }
 .reel-cat.CONCERTO{color:#D8453C}
 .reel-cat.SERATA  {color:#7B4FFF}
@@ -209,15 +211,23 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
 .reel-cat.FOOD    {color:#E0653A}
 .reel-cat.CULTURA {color:#A04AD3}
 .reel-meta{
-  display:flex;align-items:stretch;gap:8px;
+  display:flex;align-items:stretch;gap:0;
   color:#16140F;
+  background:rgba(10,10,10,0.76);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:13px;
+  overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,0.24);
+  backdrop-filter:blur(10px);
+  isolation:isolate;
+  flex:0 1 auto;
+  max-width:66%;
 }
 .mini-cal{
-  width:48px;min-height:54px;border-radius:9px;overflow:hidden;
-  background:rgba(255,255,255,0.96);
-  border:1px solid rgba(255,255,255,0.55);
-  box-shadow:0 8px 22px rgba(0,0,0,0.18);
+  width:58px;min-height:60px;overflow:hidden;
+  background:rgba(255,255,255,0.98);
   text-align:center;
+  flex:0 0 58px;
 }
 .mini-cal-month{
   display:block;
@@ -239,17 +249,14 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
   padding:2px 2px 5px;
 }
 .date-context{
-  align-self:center;
   color:#fff;
-  background:rgba(0,0,0,0.45);
-  border:1px solid rgba(255,255,255,0.16);
-  backdrop-filter:blur(8px);
-  padding:7px 9px;border-radius:10px;
-  display:flex;flex-direction:column;gap:1px;
-  min-width:72px;
+  padding:9px 11px;
+  display:flex;flex-direction:column;justify-content:center;gap:2px;
+  min-width:0;
 }
 .date-rel{
   font-size:10px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .date-time{
   font-size:11px;font-weight:600;color:rgba(255,255,255,0.82);
@@ -289,7 +296,7 @@ body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:1
 }
 
 .reel-source{
-  position:absolute;top:82px;left:14px;z-index:4;
+  position:absolute;top:90px;left:14px;z-index:4;
   color:#fff;text-decoration:none;
   display:inline-flex;align-items:center;gap:6px;
   max-width:calc(100% - 28px);
