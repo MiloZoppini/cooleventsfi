@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COOL.FI — eventi a Firenze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#F4F1EA;
+  --bg2:#FFFFFF;
+  --bg3:#FAF7F0;
+  --text:#16140F;
+  --muted:#75716A;
+  --accent:#C8FF00;
+  --accent-deep:#A6D900;
+  --border:rgba(22,20,15,0.08);
+  --border-hover:rgba(22,20,15,0.18);
+  --shadow:0 1px 2px rgba(22,20,15,0.04), 0 8px 24px rgba(22,20,15,0.05);
+  --shadow-hover:0 2px 6px rgba(22,20,15,0.08), 0 18px 50px rgba(22,20,15,0.1);
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden}
+body{font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
+
+/* ─── APP LAYOUT ─── */
+.app{
+  height:100vh;height:100dvh;
+  display:grid;
+  grid-template-rows:auto 1fr;
+}
+
+/* ─── HEADER ─── */
+.hd{
+  padding:1rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  background:var(--bg);
+  z-index:10;
+}
+.logo{
+  font-family:'Syne','Helvetica Neue',sans-serif;
+  font-weight:800;font-size:20px;letter-spacing:-0.03em;line-height:1;
+  display:flex;align-items:center;gap:2px;
+}
+.logo-dot{color:var(--accent-deep);font-size:26px;line-height:0.7}
+.hd-mid{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:0 1 auto}
+.hd-mid::-webkit-scrollbar{display:none}
+.fb{
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--muted);font-family:inherit;font-size:11px;font-weight:500;
+  padding:6px 13px;border-radius:100px;cursor:pointer;
+  white-space:nowrap;transition:all 0.15s;
+  text-transform:uppercase;letter-spacing:0.06em;
+}
+.fb:hover{color:var(--text);border-color:var(--border-hover)}
+.fb.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.hd-right{text-align:right;flex-shrink:0}
+.hd-date{font-size:11px;color:var(--muted);text-transform:capitalize}
+.hd-city{font-size:11px;color:var(--muted)}
+
+/* ─── MAIN ─── */
+.main{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  overflow:hidden;
+  min-height:0;
+}
+
+/* ─── SIDEBAR GALLERY ─── */
+.gallery{
+  border-right:1px solid var(--border);
+  overflow-y:auto;overflow-x:hidden;
+  padding:1rem 0.875rem;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border-hover) transparent;
+}
+.gallery::-webkit-scrollbar{width:6px}
+.gallery::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:3px}
+.gallery-title{
+  font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);margin:0 4px 10px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.gallery-count{
+  background:var(--text);color:var(--bg);
+  padding:2px 8px;border-radius:100px;font-size:10px;
+}
+.thumbs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.thumb{
+  position:relative;
+  aspect-ratio:3/4;
+  border-radius:10px;overflow:hidden;
+  cursor:pointer;
+  background:#E8E4DA;
+  border:2px solid transparent;
+  transition:transform 0.15s, border-color 0.15s;
+}
+.thumb:hover{transform:translateY(-2px)}
+.thumb.active{border-color:var(--accent-deep)}
+.thumb img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.thumb::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%);
+}
+.thumb-lbl{
+  position:absolute;left:6px;right:6px;bottom:5px;z-index:2;
+  font-size:10px;font-weight:600;color:#fff;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  line-height:1.2;
+  text-shadow:0 1px 4px rgba(0,0,0,0.6);
+}
+.thumb-cat{
+  position:absolute;top:5px;left:5px;z-index:2;
+  font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  background:rgba(255,255,255,0.92);color:#16140F;
+  padding:2px 6px;border-radius:100px;backdrop-filter:blur(6px);
+}
+
+/* ─── REEL FEED ─── */
+.feed{
+  overflow-y:auto;overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  padding:1rem 0;
+  display:flex;flex-direction:column;align-items:center;
+  gap:1rem;
+}
+.feed::-webkit-scrollbar{display:none}
+
+.reel{
+  position:relative;
+  scroll-snap-align:center;
+  scroll-snap-stop:always;
+  width:min(420px, 92vw);
+  aspect-ratio:9/16;
+  max-height:calc(100vh - 8rem);
+  border-radius:22px;overflow:hidden;
+  background:#1A1815;
+  box-shadow:var(--shadow);
+  flex-shrink:0;
+  cursor:pointer;
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+.reel:hover{box-shadow:var(--shadow-hover)}
+
+.reel-img{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+}
+.reel-img img,
+.reel-video{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.reel-video{
+  position:absolute;inset:0;
+  opacity:0;
+  transform:scale(1.02);
+  transition:opacity 0.45s ease, transform 2.4s ease;
+}
+.reel-video.ready{opacity:1;transform:scale(1)}
+.reel-video-fallback{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(1.05);
+}
+.reel-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0) 25%,
+    rgba(0,0,0,0) 45%,
+    rgba(0,0,0,0.55) 75%,
+    rgba(0,0,0,0.85) 100%);
+  pointer-events:none;
+}
+
+/* gradient fallback colors per category (shown if image fails) */
+.reel-img.CONCERTO{background:linear-gradient(135deg,#5E1815,#D8453C)}
+.reel-img.SERATA  {background:linear-gradient(135deg,#2A1A55,#7B4FFF)}
+.reel-img.MOSTRA  {background:linear-gradient(135deg,#5E3A0A,#D88A1F)}
+.reel-img.MERCATO {background:linear-gradient(135deg,#0F4520,#2DA552)}
+.reel-img.SPORT   {background:linear-gradient(135deg,#0A2855,#0A6FE0)}
+.reel-img.FOOD    {background:linear-gradient(135deg,#5E1F0A,#E0653A)}
+.reel-img.CULTURA {background:linear-gradient(135deg,#3A0F4F,#A04AD3)}
+
+.reel-top{
+  position:absolute;top:14px;left:14px;right:14px;z-index:3;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.reel-cat{
+  font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+  background:rgba(255,255,255,0.95);color:#16140F;
+  padding:5px 10px;border-radius:100px;
+  backdrop-filter:blur(8px);
+}
+.reel-cat.CONCERTO{color:#D8453C}
+.reel-cat.SERATA  {color:#7B4FFF}
+.reel-cat.MOSTRA  {color:#D88A1F}
+.reel-cat.MERCATO {color:#1B7A39}
+.reel-cat.SPORT   {color:#0A6FE0}
+.reel-cat.FOOD    {color:#E0653A}
+.reel-cat.CULTURA {color:#A04AD3}
+.reel-meta{
+  font-size:11px;font-weight:600;color:#fff;
+  background:rgba(0,0,0,0.4);
+  padding:5px 10px;border-radius:100px;
+  backdrop-filter:blur(8px);
+  letter-spacing:0.02em;
+}
+
+/* right-side actions like IG */
+.reel-actions{
+  position:absolute;right:12px;bottom:140px;z-index:3;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.act{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;cursor:pointer;
+  transition:transform 0.12s, background 0.12s;
+  border:1px solid rgba(255,255,255,0.12);
+}
+.act:hover{transform:scale(1.08);background:rgba(0,0,0,0.6)}
+.act-lbl{font-size:9px;color:#fff;margin-top:-8px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.6)}
+
+.reel-info{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  padding:18px 70px 22px 18px;
+  color:#fff;
+  display:flex;flex-direction:column;gap:6px;
+}
+.reel-title{
+  font-family:'Syne','Helvetica Neue',sans-serif;
+  font-weight:700;font-size:22px;line-height:1.1;letter-spacing:-0.02em;
+  text-shadow:0 2px 12px rgba(0,0,0,0.4);
+}
+.reel-loc{
+  font-size:13px;color:rgba(255,255,255,0.92);
+  display:flex;align-items:center;gap:5px;
+  text-shadow:0 1px 6px rgba(0,0,0,0.5);
+}
+.reel-loc::before{content:'↗';font-size:11px;opacity:0.8}
+.reel-desc{
+  font-size:13px;line-height:1.45;color:rgba(255,255,255,0.85);
+  margin-top:3px;
+  text-shadow:0 1px 6px rgba(0,0,0,0.5);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.reel-vibes{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.vibe{
+  font-size:10.5px;color:#fff;font-weight:500;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.25);
+  backdrop-filter:blur(6px);
+  padding:3px 9px;border-radius:100px;
+}
+
+.reel-tap{
+  position:absolute;bottom:18px;right:18px;z-index:3;
+  font-size:10px;color:rgba(255,255,255,0.75);font-weight:600;
+  letter-spacing:0.05em;text-transform:uppercase;
+  display:flex;align-items:center;gap:4px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* play indicator (placeholder for video) */
+.reel-play{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:24px;
+  border:1.5px solid rgba(255,255,255,0.5);
+  opacity:0;transition:opacity 0.2s;
+  pointer-events:none;
+  z-index:2;
+}
+.reel:hover .reel-play{opacity:1}
+.reel.has-video .reel-play{
+  top:18px;left:auto;right:18px;
+  transform:none;
+  width:auto;height:auto;border-radius:100px;
+  padding:5px 9px;
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  background:rgba(0,0,0,0.42);
+  border:1px solid rgba(255,255,255,0.18);
+  opacity:1;
+}
+.reel.has-video .reel-play::before{
+  content:'';
+  width:6px;height:6px;border-radius:50%;
+  background:#C8FF00;
+  display:inline-block;margin-right:6px;
+  box-shadow:0 0 12px rgba(200,255,0,0.9);
+}
+.reel-source{
+  position:absolute;top:52px;left:14px;z-index:4;
+  color:#fff;text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;
+  max-width:calc(100% - 28px);
+  padding:5px 9px;border-radius:100px;
+  background:rgba(0,0,0,0.42);
+  border:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(8px);
+  font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+}
+.reel-source::before{
+  content:'';
+  width:6px;height:6px;border-radius:50%;
+  background:#fff;
+  opacity:0.85;
+}
+.reel-source span{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ─── MODAL ─── */
+.modal{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(22,20,15,0.6);backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;
+  padding:1.5rem;
+  animation:fadeIn 0.2s ease;
+}
+.modal.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal-card{
+  background:var(--bg2);
+  border-radius:20px;
+  width:100%;max-width:540px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 30px 80px rgba(0,0,0,0.4);
+  scrollbar-width:thin;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+
+.modal-cover{
+  position:relative;aspect-ratio:16/10;overflow:hidden;
+  background:#E8E4DA;
+}
+.modal-cover img,
+.modal-cover video{width:100%;height:100%;object-fit:cover;display:block}
+.modal-cover video{background:#16140F}
+.modal-cover-play{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.35));
+}
+.modal-cover.has-video .modal-cover-play{
+  align-items:flex-start;justify-content:flex-start;
+  padding:12px;
+  background:linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0) 45%);
+  pointer-events:none;
+}
+.modal-cover-play .pp{
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(255,255,255,0.95);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#16140F;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  cursor:pointer;
+  transition:transform 0.15s;
+}
+.modal-cover-play .pp:hover{transform:scale(1.06)}
+.modal-cover.has-video .modal-cover-play .pp{
+  width:auto;height:auto;
+  padding:6px 10px;
+  font-size:10px;font-weight:800;letter-spacing:0.08em;
+  color:#16140F;
+  box-shadow:none;
+}
+.modal-close{
+  position:absolute;top:12px;right:12px;z-index:2;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);
+  border:none;color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{background:rgba(0,0,0,0.75)}
+
+.modal-body{padding:1.5rem 1.5rem 1.75rem}
+.modal-cat-row{
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.modal-cat{
+  font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+  padding:4px 10px;border-radius:100px;
+}
+.modal-cat.CONCERTO{background:rgba(216,69,60,0.12);color:#D8453C}
+.modal-cat.SERATA  {background:rgba(123,79,255,0.12);color:#7B4FFF}
+.modal-cat.MOSTRA  {background:rgba(216,138,31,0.12);color:#D88A1F}
+.modal-cat.MERCATO {background:rgba(45,165,82,0.12);color:#1B7A39}
+.modal-cat.SPORT   {background:rgba(10,111,224,0.12);color:#0A6FE0}
+.modal-cat.FOOD    {background:rgba(224,101,58,0.12);color:#E0653A}
+.modal-cat.CULTURA {background:rgba(160,74,211,0.12);color:#A04AD3}
+.modal-meta{font-size:12px;color:var(--muted);font-weight:500}
+.modal-title{
+  font-family:'Syne','Helvetica Neue',sans-serif;
+  font-weight:700;font-size:26px;letter-spacing:-0.02em;line-height:1.1;
+  margin-bottom:6px;
+}
+.modal-loc{
+  font-size:14px;color:var(--muted);
+  display:flex;align-items:center;gap:5px;margin-bottom:14px;
+}
+.modal-loc::before{content:'↗';font-size:11px;opacity:0.6}
+.modal-desc{
+  font-size:14.5px;line-height:1.55;
+  color:rgba(22,20,15,0.78);margin-bottom:14px;
+}
+.modal-source{
+  display:inline-flex;align-items:center;gap:7px;
+  color:var(--text);text-decoration:none;
+  background:var(--bg);border:1px solid var(--border);
+  padding:7px 10px;border-radius:100px;
+  font-size:12px;font-weight:700;
+  margin:2px 0 14px;
+}
+.modal-source::before{
+  content:'';width:7px;height:7px;border-radius:50%;background:var(--accent-deep);
+}
+.modal-vibes{display:flex;flex-wrap:wrap;gap:6px}
+.modal-vibes .vibe{
+  background:var(--bg);color:var(--muted);
+  border:1px solid var(--border);
+  text-shadow:none;
+  font-size:11.5px;
+}
+
+.modal-actions{
+  display:flex;gap:8px;margin-top:18px;
+}
+.btn{
+  flex:1;padding:11px 14px;border-radius:12px;
+  font-family:inherit;font-size:13px;font-weight:600;
+  border:1px solid var(--border);background:var(--bg2);color:var(--text);
+  cursor:pointer;transition:all 0.15s;
+}
+.btn:hover{border-color:var(--border-hover)}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn-primary:hover{background:#000}
+
+/* ─── EMPTY ─── */
+.empty{
+  padding:4rem 1.5rem;text-align:center;
+  color:var(--muted);font-size:14px;line-height:1.7;
+  width:100%;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:760px){
+  .main{grid-template-columns:1fr}
+  .gallery{display:none}
+  .hd-mid{display:none}
+  .reel{max-height:calc(100vh - 6rem);width:min(420px,96vw)}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header class="hd">
+    <div class="logo">COOL<span class="logo-dot">.</span>FI</div>
+    <div class="hd-mid" id="filters">
+      <button class="fb active" data-cat="TUTTI">Tutti</button>
+      <button class="fb" data-cat="CONCERTO">Concerti</button>
+      <button class="fb" data-cat="SERATA">Serate</button>
+      <button class="fb" data-cat="MOSTRA">Mostre</button>
+      <button class="fb" data-cat="MERCATO">Mercati</button>
+      <button class="fb" data-cat="SPORT">Sport</button>
+      <button class="fb" data-cat="FOOD">Food</button>
+      <button class="fb" data-cat="CULTURA">Cultura</button>
+    </div>
+    <div class="hd-right">
+      <div class="hd-date" id="hd-date"></div>
+      <div class="hd-city">Firenze</div>
+    </div>
+  </header>
+
+  <!-- Main: gallery + reel feed -->
+  <div class="main">
+    <aside class="gallery" id="gallery">
+      <div class="gallery-title">
+        <span>Tutti gli eventi</span>
+        <span class="gallery-count" id="g-count">0</span>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </aside>
+
+    <section class="feed" id="feed"></section>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<script>
+// ── Date ──
+const now = new Date();
+document.getElementById('hd-date').textContent = now.toLocaleDateString('it-IT',{
+  weekday:'long', day:'numeric', month:'long'
+});
+
+// ── Real events (curated, Firenze · 29 apr → 3 mag 2026) ──
+const U = (id, w=900, h=1600) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
+
+const officialSocials = {
+  maggio: {
+    platform: 'Instagram',
+    label: '@teatrodelmaggio',
+    url: 'https://www.instagram.com/teatrodelmaggio/'
+  },
+  strozzi: {
+    platform: 'Instagram',
+    label: '@palazzostrozzi',
+    url: 'https://www.instagram.com/palazzostrozzi'
+  },
+  mida: {
+    platform: 'Instagram',
+    label: '@mostrartigianato',
+    url: 'https://www.instagram.com/mostrartigianato'
+  }
+};
+
+const socialFor = ev => ev.social || officialSocials[ev.socialKey] || null;
+const videoFor = ev => ev.socialVideo || ev.video || '';
+const sourceFor = ev => {
+  const social = socialFor(ev);
+  if (!social) return null;
+  return {
+    ...social,
+    tag: ev.socialVideo ? `video da ${social.label}` : social.label
+  };
+};
+
+const allEvents = [
+  // ─── Mer 29 aprile ───
+  {
+    titolo: "Zubin Mehta · 90° compleanno",
+    data: "mer 29/04", orario: "20:00",
+    luogo: "Teatro del Maggio Musicale", quartiere: "Cascine",
+    categoria: "CONCERTO",
+    descrizione: "Il Maestro festeggia i suoi 90 anni dirigendo l'Orchestra del Maggio. Evento storico.",
+    vibe: ["classica", "evento-unico", "maggiomusicale"],
+    socialKey: "maggio",
+    img: "1465847899084-d164df4dedc6"
+  },
+  {
+    titolo: "Mark Rothko",
+    data: "fino 23/08", orario: "10:00–20:00",
+    luogo: "Palazzo Strozzi", quartiere: "Centro",
+    categoria: "MOSTRA",
+    descrizione: "Grande retrospettiva sul maestro dell'espressionismo astratto americano.",
+    vibe: ["arte-contemporanea", "must-see", "rothko"],
+    socialKey: "strozzi",
+    socialVideo: "https://www.palazzostrozzi.org/wp-content/uploads/2026/03/MR_Rullo-sito_ott.mp4",
+    img: "1577083552431-6e5fd01988ec"
+  },
+  {
+    titolo: "Stensen Sostenibile · moda etica",
+    data: "mer 29/04", orario: "19:00 / 21:30",
+    luogo: "Cinema Astra · Stensen", quartiere: "Campo di Marte",
+    categoria: "CULTURA",
+    descrizione: "Proiezioni su moda sostenibile e showroom vintage nel foyer.",
+    vibe: ["sostenibilità", "vintage", "cinema"],
+    img: "1489599849927-2ee91cede3ba"
+  },
+  {
+    titolo: "MIDA · Mostra Artigianato",
+    data: "fino 3/05", orario: "10:00–22:30",
+    luogo: "Fortezza da Basso", quartiere: "Fortezza",
+    categoria: "MERCATO",
+    descrizione: "90ª edizione, oltre 500 espositori da Italia ed estero. Design e food.",
+    vibe: ["artigianato", "design", "mida"],
+    socialKey: "mida",
+    socialVideo: "https://admin.mida90.wodka.agency/uploads/VIDEO_EVENTO_RECAP_MIDA_2025_10_1_82a6fee9a3.mp4",
+    img: "1452860606245-08befc0ff44b"
+  },
+  {
+    titolo: "Firenze Déco · anni Venti",
+    data: "in corso", orario: "9:00–19:00",
+    luogo: "Palazzo Medici Riccardi", quartiere: "San Lorenzo",
+    categoria: "MOSTRA",
+    descrizione: "Atmosfere déco fiorentine: arti applicate, moda e design degli anni Venti.",
+    vibe: ["déco", "vintage", "novecento"],
+    socialKey: "strozzi",
+    socialVideo: "https://www.palazzostrozzi.org/wp-content/uploads/2026/03/MR_Rullo-sito_ott.mp4",
+    img: "1605350353407-d7a98fe16b21"
+  },
+  {
+    titolo: "Mostra mercato di piante e fiori",
+    data: "fino 3/05", orario: "9:00–19:30",
+    luogo: "Giardino dell'Orticoltura", quartiere: "Libertà",
+    categoria: "MERCATO",
+    descrizione: "70+ espositori, ingresso gratuito. Piante rare, fiori e vivai di primavera.",
+    vibe: ["green", "primavera", "free"],
+    img: "1490750967868-88aa4486c946"
+  },
+  {
+    titolo: "Farsi forma · vasi etruschi",
+    data: "fino 30/05", orario: "8:15–14:00",
+    luogo: "Opificio delle Pietre Dure", quartiere: "San Marco",
+    categoria: "MOSTRA",
+    descrizione: "Il restauro di cinque vasi etruschi del Museo Guarnacci di Volterra.",
+    vibe: ["archeologia", "restauro", "etruschi"],
+    img: "1554907984-15263bfd63bd"
+  },
+
+  // ─── Ven 1 maggio ───
+  {
+    titolo: "Trofeo Marzocco · sbandieratori",
+    data: "ven 1/05", orario: "14:30",
+    luogo: "Piazza della Signoria", quartiere: "Centro",
+    categoria: "SPORT",
+    descrizione: "Corteo dal Palagio di Parte Guelfa e gara tra gruppi storici. Gratis.",
+    vibe: ["tradizione", "free", "outdoor"],
+    img: "1543429776-2782fc8e1acd"
+  },
+  {
+    titolo: "Fiera del 1° Maggio · Cascine",
+    data: "ven 1/05", orario: "8:00–20:00",
+    luogo: "Viale Lincoln · P.le Kennedy", quartiere: "Cascine",
+    categoria: "MERCATO",
+    descrizione: "Lo storico mercato della Festa del Lavoro. Bancarelle a perdita d'occhio.",
+    vibe: ["street", "tradizione", "outdoor"],
+    img: "1488459716781-31db52582fe9"
+  },
+  {
+    titolo: "VIVO · Ippodromo del Visarno",
+    data: "ven 1/05", orario: "11:00–24:00",
+    luogo: "Ippodromo del Visarno", quartiere: "Cascine",
+    categoria: "FOOD",
+    descrizione: "Musica live, mercatino creativo, street food, area kids. Festa all'aperto.",
+    vibe: ["festival", "outdoor", "music"],
+    img: "1533174072545-7a4b6ad7a6c3"
+  },
+
+  // ─── Sab 2 maggio ───
+  {
+    titolo: "Annalisa · live",
+    data: "sab 2/05", orario: "21:00",
+    luogo: "Nelson Mandela Forum", quartiere: "Campo di Marte",
+    categoria: "CONCERTO",
+    descrizione: "Tappa fiorentina del tour. Pop italiano sold-out.",
+    vibe: ["pop", "live", "tour"],
+    social: {
+      platform: "Instagram",
+      label: "@annalisaofficial",
+      url: "https://www.instagram.com/annalisaofficial/"
+    },
+    img: "1501386761578-eac5c94b800a"
+  },
+  {
+    titolo: "Concerti barocchi · K.O.F.",
+    data: "ven 1/05", orario: "21:00",
+    luogo: "Chiesa di Santa Felicita", quartiere: "Oltrarno",
+    categoria: "CULTURA",
+    descrizione: "Apertura della rassegna barocca in luoghi storici. Acustica magica.",
+    vibe: ["barocco", "chiesa", "intimo"],
+    img: "1571696769037-c6a7c44c1db6"
+  },
+
+  // ─── Dom 3 maggio ───
+  {
+    titolo: "Elisa · live",
+    data: "dom 3/05", orario: "21:00",
+    luogo: "Nelson Mandela Forum", quartiere: "Campo di Marte",
+    categoria: "CONCERTO",
+    descrizione: "Concerto del nuovo tour. Voce iconica del cantautorato italiano.",
+    vibe: ["pop", "live", "tour"],
+    social: {
+      platform: "Instagram",
+      label: "@elisatoffoli",
+      url: "https://www.instagram.com/elisatoffoli/"
+    },
+    img: "1470225620780-dba8ba36b745"
+  },
+  {
+    titolo: "Fiera di Campo di Marte · 300 stand",
+    data: "dom 3/05", orario: "8:00–20:00",
+    luogo: "Viale Fanti · Viale Paoli", quartiere: "Campo di Marte",
+    categoria: "MERCATO",
+    descrizione: "Mostra mercato della domenica con oltre 300 espositori. Vintage e artigianato.",
+    vibe: ["mercatino", "weekend", "outdoor"],
+    img: "1472851294608-062f824d29cc"
+  },
+  {
+    titolo: "Musei Civici gratis · residenti",
+    data: "dom 3/05", orario: "9:00–19:00",
+    luogo: "Medici Riccardi · Bargello", quartiere: "Centro",
+    categoria: "CULTURA",
+    descrizione: "Ingresso gratuito per residenti Città Metropolitana. Anche Accademia aperta.",
+    vibe: ["free", "musei", "residenti"],
+    img: "1518998053901-5348d3961a04"
+  }
+];
+
+let activeFilter = 'TUTTI';
+let filtered = allEvents;
+
+const feedEl = document.getElementById('feed');
+const thumbsEl = document.getElementById('thumbs');
+const gCount = document.getElementById('g-count');
+const modal = document.getElementById('modal');
+const modalCard = document.getElementById('modal-card');
+
+// ── Filter buttons ──
+document.querySelectorAll('.fb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.cat;
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+// ── Render ──
+function render() {
+  filtered = activeFilter === 'TUTTI'
+    ? allEvents
+    : allEvents.filter(e => (e.categoria || '').toUpperCase() === activeFilter);
+
+  gCount.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    feedEl.innerHTML = `<div class="empty">Nessun evento per questa categoria.<br>Prova a cambiare filtro.</div>`;
+    thumbsEl.innerHTML = '';
+    return;
+  }
+
+  feedEl.innerHTML = filtered.map((e, i) => reelHTML(e, i)).join('');
+  thumbsEl.innerHTML = filtered.map((e, i) => thumbHTML(e, i)).join('');
+
+  // wire reel clicks → modal
+  feedEl.querySelectorAll('.reel').forEach((el, i) => {
+    el.addEventListener('click', (ev) => {
+      // ignore clicks on action buttons
+      if (ev.target.closest('.act')) return;
+      openModal(filtered[i]);
+    });
+  });
+
+  // wire thumb clicks → scroll feed
+  thumbsEl.querySelectorAll('.thumb').forEach((el, i) => {
+    el.addEventListener('click', () => {
+      const target = feedEl.querySelectorAll('.reel')[i];
+      if (target) target.scrollIntoView({ behavior:'smooth', block:'center' });
+      setActiveThumb(i);
+    });
+  });
+
+  // observe which reel is centered → highlight thumb
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting && en.intersectionRatio > 0.6) {
+        const idx = Number(en.target.dataset.idx);
+        setActiveThumb(idx);
+      }
+      const video = en.target.querySelector('video');
+      if (video) {
+        if (en.isIntersecting && en.intersectionRatio > 0.55) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, { root: feedEl, threshold:[0.6, 0.9] });
+
+  feedEl.querySelectorAll('.reel').forEach(r => observer.observe(r));
+  feedEl.querySelectorAll('.reel-video').forEach(video => {
+    video.addEventListener('canplay', () => video.classList.add('ready'), { once:true });
+    video.addEventListener('error', () => video.remove(), { once:true });
+  });
+
+  setActiveThumb(0);
+}
+
+function setActiveThumb(idx) {
+  thumbsEl.querySelectorAll('.thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+    if (i === idx) t.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+}
+
+function reelHTML(ev, i) {
+  const cat = (ev.categoria || 'CULTURA').toUpperCase();
+  const meta = [ev.data, ev.orario].filter(Boolean).join(' · ');
+  const loc = [ev.luogo, ev.quartiere].filter(Boolean).join(' · ');
+  const vibes = (ev.vibe || []).slice(0,3).map(v => `<span class="vibe">#${v}</span>`).join('');
+  const imgUrl = ev.img ? U(ev.img, 900, 1600) : '';
+  const videoUrl = videoFor(ev);
+  const source = sourceFor(ev);
+  return `
+    <article class="reel ${videoUrl ? 'has-video' : ''}" data-idx="${i}">
+      <div class="reel-img ${cat}">
+        ${imgUrl ? `<img class="reel-video-fallback" src="${imgUrl}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+        ${videoUrl ? `<video class="reel-video" src="${videoUrl}" poster="${imgUrl}" autoplay muted loop playsinline preload="metadata"></video>` : ''}
+      </div>
+      <div class="reel-overlay"></div>
+      ${videoUrl ? `<div class="reel-play">reel</div>` : ''}
+
+      <div class="reel-top">
+        <span class="reel-cat ${cat}">${cat}</span>
+        <span class="reel-meta">${meta}</span>
+      </div>
+      ${source ? `<a class="reel-source" href="${source.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><span>${source.tag}</span></a>` : ''}
+
+      <div class="reel-actions">
+        <div class="act" title="Mi piace">♡</div>
+        <div class="act" title="Salva">⌘</div>
+        <div class="act" title="Condividi">↗</div>
+      </div>
+
+      <div class="reel-info">
+        <div class="reel-title">${ev.titolo || 'Evento'}</div>
+        ${loc ? `<div class="reel-loc">${loc}</div>` : ''}
+        ${ev.descrizione ? `<div class="reel-desc">${ev.descrizione}</div>` : ''}
+        ${vibes ? `<div class="reel-vibes">${vibes}</div>` : ''}
+      </div>
+    </article>`;
+}
+
+function thumbHTML(ev, i) {
+  const cat = (ev.categoria || 'CULTURA').toUpperCase();
+  const imgUrl = ev.img ? U(ev.img, 240, 320) : '';
+  return `
+    <div class="thumb" data-idx="${i}">
+      ${imgUrl ? `<img src="${imgUrl}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+      <span class="thumb-cat">${cat}</span>
+      <span class="thumb-lbl">${ev.titolo || 'Evento'}</span>
+    </div>`;
+}
+
+// ── Modal ──
+function openModal(ev) {
+  const cat = (ev.categoria || 'CULTURA').toUpperCase();
+  const meta = [ev.data, ev.orario].filter(Boolean).join(' · ');
+  const loc = [ev.luogo, ev.quartiere].filter(Boolean).join(' · ');
+  const vibes = (ev.vibe || []).map(v => `<span class="vibe">#${v}</span>`).join('');
+  const imgUrl = ev.img ? U(ev.img, 1100, 700) : '';
+  const videoUrl = videoFor(ev);
+  const source = sourceFor(ev);
+  const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent((ev.luogo||'') + ' Firenze')}`;
+
+  modalCard.innerHTML = `
+    <div class="modal-cover ${videoUrl ? 'has-video' : ''}">
+      ${videoUrl ? `<video src="${videoUrl}" poster="${imgUrl}" autoplay muted loop playsinline controls preload="metadata"></video>` : `${imgUrl ? `<img src="${imgUrl}" alt="" onerror="this.remove()">` : ''}`}
+      <div class="modal-cover-play">
+        <div class="pp" title="Anteprima video">${videoUrl ? 'LIVE' : '▶'}</div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat-row">
+        <span class="modal-cat ${cat}">${cat}</span>
+        <span class="modal-meta">${meta}</span>
+      </div>
+      <h2 class="modal-title">${ev.titolo || 'Evento'}</h2>
+      ${loc ? `<div class="modal-loc">${loc}</div>` : ''}
+      ${ev.descrizione ? `<p class="modal-desc">${ev.descrizione}</p>` : ''}
+      ${source ? `<a class="modal-source" href="${source.url}" target="_blank" rel="noopener">${source.platform} ${source.label}</a>` : ''}
+      ${vibes ? `<div class="modal-vibes">${vibes}</div>` : ''}
+      <div class="modal-actions">
+        <button class="btn">Salva</button>
+        ${source ? `<a class="btn" href="${source.url}" target="_blank" rel="noopener">Apri social</a>` : ''}
+        <a class="btn btn-primary" href="${mapsUrl}" target="_blank" rel="noopener">Apri in Maps ↗</a>
+      </div>
+    </div>`;
+  modal.classList.add('show');
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+}
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── Boot ──
+render();
+</script>
+</body>
+</html>
